@@ -104,7 +104,6 @@ function makeTreeLinksHtml(filename)
 */
 function exist(filename)
 {
-    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
     return DatabaseManager().database.getFilesByName(filename + '.md').hasNext();
 }
 
@@ -115,7 +114,6 @@ function exist(filename)
 */
 function getMarkdownContent(filename)
 {
-    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
     return DatabaseManager().database.getFilesByName(filename + '.md').next().getBlob().getDataAsString('utf-8');
 }
 
@@ -128,7 +126,6 @@ function getMarkdownContent(filename)
 */
 function overwriteFile(filename, content)
 {
-    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
     var database = DatabaseManager().database;
     if (exist(filename)) {
         // 存在するときは上書き
@@ -150,7 +147,6 @@ function overwriteFile(filename, content)
 function getChildLinks(filename)
 {
     const link_url = ScriptApp.getService().getUrl();
-    //var files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
     var files = DatabaseManager().database.getFiles();
 
 
@@ -177,10 +173,8 @@ function getChildLinks(filename)
 function getChildLinksHtml(filename)
 {
     const link_url = ScriptApp.getService().getUrl();
-    //const files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
 
-    // パターンマッチは "filename/hoge.md"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
-    //const match_condition = new RegExp('^' + filename + (filename=='' ? '' : '/') + '[^\s/]+\.md$');
+    // パターンマッチは "filename/hoge"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
     const match_condition = new RegExp('^' + filename + (filename == '' ? '' : '/') + '[^\s/]+$');
 
     /*

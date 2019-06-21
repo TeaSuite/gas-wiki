@@ -11,7 +11,7 @@ function doGet(e)
     var action = e.parameter.action;  // 動作
     var title = e.parameter.title;    // タイトル
 
-    appendLog("action = " + action + ", title = " + title + "\n");
+    //appendLog("action = " + action + ", title = " + title + "\n");
 
     if (title == null) {  // メインページ
         if (action == "edit") {
