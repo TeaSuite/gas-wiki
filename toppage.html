@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('common_css').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('toppage_css').getContent(); ?>
+  </head>
+  <body>
+    <div id="wrapper">
+    
+      <div id="menu">
+        <div id="icon">
+          <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec"><img width="80%" src="https://drive.google.com/uc?id=18559zrgB0v919PK3pu11mmlfmrgaxIeb" alt="drama logo"></a>
+        </div>
+        <ul>
+          <li><a href="http://www.google.com">Google</a></li>
+        </ul>
+      </div>
+
+      <div id="content">
+      
+        <div id="header">ESS Drama Wiki</div>     
+        <div id="title">メインページ</div>
+        
+        <div id="info">
+          <span style="font-size: 16pt">連絡情報</span><span style='font-size: 10pt'><a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec?action=edit">[編集]</a></span>
+        </div>
+        <div id="pagelist">
+          <span style="font-size: 16pt">最新の32件</span>
+          <?!= latest_articles ?>
+        </div>
+        
+      </div>
+
+      <div id="footer">
+      </div>
+      
+    </div>
+  </body>
+</html>
+

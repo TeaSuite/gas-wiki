@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
+    
+    <?!= HtmlService.createHtmlOutputFromFile('common_css').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('subpage_css').getContent(); ?>
+  </head>
+  <body>
+    <div id="wrapper">
+    
+      <div id="menu">
+        <div id="icon">
+          <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec"><img width="80%" src="https://drive.google.com/uc?id=18559zrgB0v919PK3pu11mmlfmrgaxIeb" alt="drama logo"></a>
+        </div>
+        <ul>
+          <li><a href="http://www.google.com">Google</a></li>
+        </ul>
+      </div>
+
+      <div id="content">
+      
+        <div id="header">
+          ESS Drama Wiki
+        </div>
+        
+        <div id="title">
+          <span class='caption' style="font-size: 20pt;">
+            <?= title ?>
+          </span>
+          <span style='font-size: 10pt'>
+            <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec?title=<?=title?>&action=edit">[編集]</a>
+          </span>
+        </div>
+        
+        <div id="linktree"><?!= tree ?></div>
+        <div id="page"><?= content ?></div>
+        
+        <div id="child_links">
+          <div style='font-size: 16pt; border-bottom: groove 2px;'>下位ページ</div>
+          <?!= child_links ?>
+        </div>
+        <script>
+          // ページの内容をhtmlに変換してから表示する
+          function writeContent(content_md)
+          {
+            console.log(content);
+            var page_div = document.getElementById('page');
+        
+            console.log("content_md: " + content_md);
+        
+            var content_html = marked(content_md);
+            console.log("content_html: " + content_html);
+        
+            page_div.innerHTML = content_html; 
+          }
+          
+          function writeChildLinks(links_html)
+          {
+            var link_div = document.getElementById('child_links');
+            console.log(links_html);
+            link_div.innerHTML = links_html;
+          }
+          
+          writeContent(document.getElementById('page').innerHTML);
+          console.log(document.getElementById('page').innerHTML);
+        </script>
+      </div>
+
+      <div id="footer"></div>
+      
+    </div>
+  </body>
+</html>
+

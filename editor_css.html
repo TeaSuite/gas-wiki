@@ -1,0 +1,38 @@
+<style>
+  #content {
+    display: grid; 
+    grid-template-rows: 100px auto auto 1fr;
+    grid-template-columns: 100%;
+  }
+
+  #header {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 2;
+
+    font-size: 40pt;
+    font-weight: bold;
+
+    padding-left: 4%;
+  }
+
+  #title {
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 2;
+
+    border-bottom: inset 2px;
+    
+    padding-left: 2%;
+  }
+
+  #markdown {
+    grid-row-start: 3;
+    grid-row-end: 4;
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
+  
+</style>
