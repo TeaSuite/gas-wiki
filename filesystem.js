@@ -3,12 +3,12 @@
 */
 function removeExtension(filename)
 {
-  var pattern_match = filename.match(/(.*)(?:\.([^.]+$))/);
-  if( pattern_match != null){
-    return pattern_match[1];
-  } else {
-    return filename;
-  }
+    var pattern_match = filename.match(/(.*)(?:\.([^.]+$))/);
+    if (pattern_match != null) {
+        return pattern_match[1];
+    } else {
+        return filename;
+    }
 }
 
 /*
@@ -17,9 +17,9 @@ function removeExtension(filename)
 */
 function makeFilenameFromTree(tree)
 {
-  return tree.reverse().reduce(function(branch, filename){
-      return filename + (filename!='' ? '/' : '') + branch;
-      }) + '.md';
+    return tree.reverse().reduce(function(branch, filename) {
+        return filename + (filename != '' ? '/' : '') + branch;
+    }) + '.md';
 }
 
 
@@ -30,45 +30,72 @@ function makeFilenameFromTree(tree)
 */
 function makeTreeFromFilename(filename)
 {
-  var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
+    var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
 
-  var keywords = removeExtension(filename).split('/');
-  var tree = [];
-  var is_leaf = false;
-  keywords.forEach(function(keyword) {
-                if(is_leaf){
-                  // 親が存在しないので文字列連結だけしていく
-                  tree.push(tree.pop() + '/' + keyword);
-                  return;
-                }
-                if(!database.getFilesByName(makeFilenameFromTree(tree.concat([keyword]))).hasNext()){ 
-                  // 階層が存在しないとき
-                  is_leaf = true;
-                }
-                tree.push(keyword);
-          });
-  return tree;
+    var keywords = removeExtension(filename).split('/');
+    var tree = [];
+    var is_leaf = false;
+    keywords.forEach(function(keyword) {
+        if (is_leaf) {
+            // 親が存在しないので文字列連結だけしていく
+            tree.push(tree.pop() + '/' + keyword);
+            return;
+        }
+        if (!database.getFilesByName(makeFilenameFromTree(tree.concat([ keyword ]))).hasNext()) {
+            // 階層が存在しないとき
+            is_leaf = true;
+        }
+        tree.push(keyword);
+    });
+    return tree;
 }
 
 /*
 * @brief 親階層へのリンクをhtmlで返す
 * @param filename : String 記事へのパス
 * @example 'Drama18/TIAFProduction2018/Set/Plan' -> [Drama18] | [TIAFProduction2018] | [Set]
-* @time 努力前は690ms
+* @time 驚きの1.44ms (努力前は690ms)
 */
 function makeTreeLinksHtml(filename)
 {
-  const link_url = ScriptApp.getService().getUrl();  
-  var tree = makeTreeFromFilename(filename);
-  var tree_parent = tree.slice(0, tree.length - 1);
-  var title = '';
-  var html = '';
-  tree_parent.forEach(function (branch) {
-        title += (title == '' ? '' : '/') + branch;
-        html += (html == '' ? '' : ' | ') + '<a href="' + link_url + '?title=' + title + '">[' + branch + ']</a>';
-    });
-  
-  return html;
+    /*
+     * 悲しいこと
+     *
+     *      関数呼び出しはやめた(手動inline化)
+     *      forEachもやめた
+     *      文字列連結は+=にした
+     *
+     * 仕様
+     *      これが遅いのは辛いので記事名にスラッシュは使えないことにする(必ず親が作られる)
+     *
+     *      汚いのは仕様
+     */
+
+    const link_url = ScriptApp.getService().getUrl();
+
+    const a_head = '<a href="';
+    const param_head = '?title=';
+    const a_foot = '">[';
+    const a_tail = ']</a>';
+
+    var keywords = removeExtension(filename).split('/');
+    var title = keywords[0];
+    var html = a_head + link_url + param_head + title + a_foot + keywords[0] + a_tail;
+    var is_leaf = false;
+    for (var i = 1; i < keywords.length; i++) {
+        title += '/';
+        title += keywords[i];
+        html += ' | ';
+        html += a_head;
+        html += link_url;
+        html += param_head;
+        html += title;
+        html += a_foot;
+        html += keywords[i];
+        html += a_tail;
+    }
+
+    return html;
 }
 
 /*
@@ -77,8 +104,8 @@ function makeTreeLinksHtml(filename)
 */
 function exist(filename)
 {
-  var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
-  return database.getFilesByName(filename + '.md').hasNext();
+    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
+    return DatabaseManager().database.getFilesByName(filename + '.md').hasNext();
 }
 
 /*
@@ -88,8 +115,8 @@ function exist(filename)
 */
 function getMarkdownContent(filename)
 {
-  var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
-  return database.getFilesByName(filename + '.md').next().getBlob().getDataAsString('utf-8');
+    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
+    return DatabaseManager().database.getFilesByName(filename + '.md').next().getBlob().getDataAsString('utf-8');
 }
 
 
@@ -101,17 +128,18 @@ function getMarkdownContent(filename)
 */
 function overwriteFile(filename, content)
 {
-  var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
-  if(exist(filename)){
-    // 存在するときは上書き
-    database.getFilesByName(filename + '.md').next().setContent(content);
-  } else {
-    // 存在しなければ作る
-    var newfile = DriveApp.createFile(filename + '.md', content);
-    database.addFile(newfile);
-  }
-  
-  updateLatest32(filename);
+    //var database = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID"));
+    var database = DatabaseManager().database;
+    if (exist(filename)) {
+        // 存在するときは上書き
+        database.getFilesByName(filename + '.md').next().setContent(content);
+    } else {
+        // 存在しなければ作る
+        var newfile = DriveApp.createFile(filename + '.md', content);
+        database.addFile(newfile);
+    }
+
+    updateLatest32(filename);
 }
 
 /*
@@ -121,23 +149,25 @@ function overwriteFile(filename, content)
 */
 function getChildLinks(filename)
 {
-  const link_url = ScriptApp.getService().getUrl();
-  var files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
-  
-  var links = []; 
-  
-  // パターンマッチは "filename/hoge.md"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
-  const match_condition = new RegExp('^' + filename + (filename=='' ? '' : '/') + '[^\s/]+\.md$');
-  
-  while(files.hasNext()){
-    var filename = files.next().getName();
-    if (filename.match(match_condition) != null){
-      var filename_noext = removeExtension(filename);
-      links.push('<a href="' + link_url + '?title=' + filename_noext + '">' + filename_noext + '</a>');
+    const link_url = ScriptApp.getService().getUrl();
+    //var files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
+    var files = DatabaseManager().database.getFiles();
+
+
+    var links = [];
+
+    // パターンマッチは "filename/hoge.md"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
+    const match_condition = new RegExp('^' + filename + (filename == '' ? '' : '/') + '[^\s/]+\.md$');
+
+    while (files.hasNext()) {
+        var filename = files.next().getName();
+        if (filename.match(match_condition) != null) {
+            var filename_noext = removeExtension(filename);
+            links.push('<a href="' + link_url + '?title=' + filename_noext + '">' + filename_noext + '</a>');
+        }
     }
-  }
-  
-  return links;
+
+    return links;
 }
 
 /*
@@ -146,19 +176,19 @@ function getChildLinks(filename)
 */
 function getChildLinksHtml(filename)
 {
-  const link_url = ScriptApp.getService().getUrl();
-  //const files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
-  
-  // パターンマッチは "filename/hoge.md"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
-  //const match_condition = new RegExp('^' + filename + (filename=='' ? '' : '/') + '[^\s/]+\.md$'); 
-  const match_condition = new RegExp('^' + filename + (filename=='' ? '' : '/') + '[^\s/]+$'); 
+    const link_url = ScriptApp.getService().getUrl();
+    //const files = DriveApp.getFolderById(PropertiesService.getScriptProperties().getProperty("DATABASE_ID")).getFiles();
 
-  /*
+    // パターンマッチは "filename/hoge.md"となるものを探す。ただし一番上の階層filename==''のときスラッシュはない
+    //const match_condition = new RegExp('^' + filename + (filename=='' ? '' : '/') + '[^\s/]+\.md$');
+    const match_condition = new RegExp('^' + filename + (filename == '' ? '' : '/') + '[^\s/]+$');
+
+    /*
    * DriveAppのAPIを呼ぶ回数を減らすため、ページリストをテキスト形式で置いておいて、それを文字列処理する
    * ページリストはトリガーで回して更新しつづける
    */
 
-  /*
+    /*
    * 本当は
    *   var links = getChildLinks(filename);
    *   var html = '<ul><li>' + links.join('</li><li>') + '</li></ul>';
@@ -168,49 +198,48 @@ function getChildLinksHtml(filename)
    *   html += '<li><a href="' + link_url + '?title=' + filename_noext + '">' + filename_noext + '</a></li>';
    * とするより、+=で結合するほうが速い
   */
-  
-  var pagelist_file = DriveApp.getFileById(PropertiesService.getScriptProperties().getProperty("PAGELIST_FILE_ID"));
-  var files = pagelist_file.getBlob().getDataAsString().split('\n');
-  
-  const li_head = '<li><a href="';
-  const param_head = '?title=';
-  const a_foot = '">';
-  const li_tail = '</a></li>';
-  
-  var html = '<ul>';
-  
-  for (var i=0; i<files.length; i++){
-    if (files[i].match(match_condition) != null){
-      html += li_head;
-      html += link_url;
-      html += param_head;
-      html += files[i];
-      html += a_foot;
-      html += files[i];
-      html += li_tail;
-    }
-  }
-  
-  html += '</ul>';
-  
-  return html;
-}
 
+    var pagelist_file = DriveApp.getFileById(PropertiesService.getScriptProperties().getProperty("PAGELIST_FILE_ID"));
+    var files = pagelist_file.getBlob().getDataAsString().split('\n');
+
+    const li_head = '<li><a href="';
+    const param_head = '?title=';
+    const a_foot = '">';
+    const li_tail = '</a></li>';
+
+    var html = '<ul>';
+
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].match(match_condition) != null) {
+            html += li_head;
+            html += link_url;
+            html += param_head;
+            html += files[i];
+            html += a_foot;
+            html += files[i];
+            html += li_tail;
+        }
+    }
+
+    html += '</ul>';
+
+    return html;
+}
 
 
 function measureExecTime()
 {
-  var filename = 'Drama18/引き継ぎ/ランスルー';
-  const repetition = 50;
-  
-  var start = new Date();
-  
-  for (var i=0; i<repetition; i++){
-    makeTreeLinksHtml(filename);
-  }
-  
-  var end = new Date();
-  
+    var filename = 'Drama18/引き継ぎ/ランスルー';
+    const repetition = 50;
 
-  Logger.log((end-start) / repetition + 'ms');
+    var start = new Date();
+
+    for (var i = 0; i < repetition; i++) {
+        makeTreeLinksHtml(filename);
+    }
+
+    var end = new Date();
+
+
+    Logger.log((end - start) / repetition + 'ms');
 }
