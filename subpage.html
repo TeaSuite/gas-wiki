@@ -12,7 +12,7 @@
     
       <div id="menu">
         <div id="icon">
-          <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec"><img width="80%" src="https://drive.google.com/uc?id=18559zrgB0v919PK3pu11mmlfmrgaxIeb" alt="drama logo"></a>
+          <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec"><img width="80%" src="https://i.imgur.com/HDxOwpD.png" alt="drama logo"></a>
         </div>
         <ul>
           <li><a href="http://www.google.com">Google</a></li>
@@ -21,9 +21,7 @@
 
       <div id="content">
       
-        <div id="header">
-          ESS Drama Wiki
-        </div>
+        <div id="header">ESS Drama Wiki</div>
         
         <div id="title">
           <span class='caption' style="font-size: 20pt;">
@@ -49,20 +47,13 @@
             var page_div = document.getElementById('page');
         
             console.log("content_md: " + content_md);
-        
+       
             var content_html = marked(content_md);
             console.log("content_html: " + content_html);
         
             page_div.innerHTML = content_html; 
           }
-          
-          function writeChildLinks(links_html)
-          {
-            var link_div = document.getElementById('child_links');
-            console.log(links_html);
-            link_div.innerHTML = links_html;
-          }
-          
+                   
           writeContent(document.getElementById('page').innerHTML);
           console.log(document.getElementById('page').innerHTML);
         </script>
