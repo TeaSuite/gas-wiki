@@ -43,14 +43,25 @@
           // ページの内容をhtmlに変換してから表示する
           function writeContent(content_md)
           {
-            console.log(content);
             var page_div = document.getElementById('page');
         
-            console.log("content_md: " + content_md);
-       
+            // marked.js option setting
+            marked.setOptions({
+              renderer: new marked.Renderer(),
+              pedantic: false,
+              gfm: true,
+              tables: true,
+              sanitize: true,
+              smartLists: true,
+            });
+           
+            /*
+             * リンクを仕様に合わせて貼り直す
+             * http始まりのものは放置、それ以外は記事パスとみなしてprefixをつける
+             */
+            var content_md = content_md.replace(/\[([^\s\]]+)\]\(((?!http)[^\s].*?)\)/g, "[$1](https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec?title=$2)");
             var content_html = marked(content_md);
-            console.log("content_html: " + content_html);
-        
+            content_html;
             page_div.innerHTML = content_html; 
           }
                    
