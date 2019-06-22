@@ -5,16 +5,36 @@
     grid-template-columns: 50% 50%;
   }
 
-  #header {
+  #top {
     grid-row-start: 1;
     grid-row-end: 2;
     grid-column-start: 1;
     grid-column-end: 3;
 
+    display: grid; 
+    grid-template-rows: 100px;
+    grid-template-columns: auto 400px;
+  }
+
+  #header {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 2;
+
     font-size: 40pt;
     font-weight: bold;
 
     padding-left: 4%;
+  }
+
+  #search{
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
+
+    position: relative;
   }
 
   #title {
