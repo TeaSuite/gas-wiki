@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('common_css').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('editor_css').getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile('search_css').getContent(); ?>
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div id="wrapper">
+    
+      <div id="menu">
+        <div id="icon">
+          <a href="https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec"><img width="80%" src="https://i.imgur.com/HDxOwpD.png" alt="drama logo"></a>
+        </div>
+        <ul>
+          <li><a href="http://www.google.com">Google</a></li>
+        </ul>
+      </div>
+
+      <div id="content">
+      
+        <div id="top">
+       
+         <div id="header">ESS Drama Wiki</div>
+       
+         <div id="search">
+           <form id="search_form" action = "https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec">
+             <input id="search_input" placeholder="Drama Wiki内の記事を検索" type="text" name="title">
+             <button id="search_button" type="submit"><i class="fas fa-2x">&#xf002;</i></button>
+           </form>
+         </div>
+        
+        </div>        
+        <div id="title">
+          <span class='caption' style="font-size: 20pt;"><?= title ?></span>
+          <span id='status' style="font-size: 18pt;">[編集中]</span>
+        </div>
+        
+        <div id='markdown'>
+          <button id='save' size="50" onclick='saveFile();'>保存</button>
+          <textarea id="editor" name="name" rows="8" cols="40"><?=content?></textarea>
+        </div>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+        <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+        <script>
+           var simplemde = new SimpleMDE({ element: document.getElementById("editor"), forceSync: true });         
+        </script>
+      </div>
+      
+      <script>
+        function saveFinishedCallback()
+        {
+          const url = 'https://script.google.com/macros/s/AKfycbwO-5J_wwiIlqS72W5U0o_I-U7qE9vuN8GDU75YFfhuzvwvxt8/exec';
+          var title = document.getElementById('title').getElementsByClassName('caption')[0].textContent.replace(/(^\s+|\s+$)/g, '').replace(/\s+/g, '_');            
+          document.getElementById('status').innerHTML = '[保存が完了しました]<a href="' + url + '?title=' + title + '">[戻る]</a>';
+        }
+        function saveFile()
+        {
+            console.log("save button clicked");
+            // タイトルは先頭や末尾に空白文字が入らないようにする
+            var title = document.getElementById('title').getElementsByClassName('caption')[0].textContent.replace(/(^\s+|\s+$)/g, '').replace(/\s+/g, '_');
+            var markdown_text = document.getElementById('editor').value;
+            console.log("title : " + title);
+            console.log("text  : " + markdown_text);
+            google.script.run.withSuccessHandler(saveFinishedCallback).overwriteFile(title, markdown_text);
+            document.getElementById('status').innerHTML = '[保存中...]';
+        }
+      </script>
+      
+      <div id="footer"></div>
+      
+    </div>
+  </body>
+    
+</html>
