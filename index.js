@@ -17,12 +17,16 @@ function doGet(e)
         if (action == "edit") {
             // 連絡ページの編集
             return getEditorPage('info', true);
+        } else if (action == "create") {
+            return getCreatePage('');
         } else {
             return getTopPage();
         }
     } else {  // 一般のページ
         if (action == "edit") {
             return getEditorPage(title, false);
+        } else if (action == "create") {
+            return getCreatePage(title);
         } else {
             if (exist(title)) {
                 // ページが存在するとき
